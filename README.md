@@ -12,7 +12,7 @@ _This repository is a joke / thought experiment made executable via simulation._
 
 Cosmic Ray Sort is a deliberately impractical sorting algorithm that delegates all state transitions to uncontrolled physical noise in the memory substrate. Instead of actively reordering elements, the algorithm passively waits for spontaneous bit flips induced by environmental perturbations (e.g., thermal noise, radiation, and other stochastic influences) to transform an initially unsorted array into a sorted configuration.
 
-Under a simple physical model of stochastic bit flips, the algorithm is formally correct and terminates almost surely (conditioned on nonzero flip rates and a finite state space). However, its expected runtime grows astronomically with input size and exceeds any practical timescale for nontrivial arrays. This project serves as a conceptual and educational exploration of the relationship between computation, thermodynamics, and physical noise.
+Under a simple physical model of stochastic bit flips, the algorithm is formally correct and terminates almost surely (conditioned on nonzero flip rates and a finite state space). However, its expected runtime grows rapidly with input size and exceeds any practical timescale for nontrivial arrays. This project serves as a conceptual and educational exploration of the relationship between computation, thermodynamics, and physical noise.
 
 ## Motivation
 
@@ -68,38 +68,47 @@ $$
 p_{\text{sorted}} = \frac{\binom{m + n - 1}{n}}{m^n}.
 $$
 
-The expected waiting time scales like $1 / p_{\text{sorted}}$, up to factors determined by temporal correlations and the mixing time of the underlying Markov process. This quantity grows rapidly with $n$, rendering the expected runtime astronomically large for all but trivial input sizes.
+A common (but physically very optimistic) back-of-the-envelope estimate is to assume the memory “effectively resamples” an independent uniform configuration at some rate $R$ states/second. Under that i.i.d. resampling idealization:
+
+$$
+\mathbb{E}[T] \approx \frac{1}{R\,p_{\text{sorted}}}.
+$$
+
+### Back-of-the-Envelope Numbers (i.i.d. resampling idealization)
+
+Take $w=8$ ($m=256$) and $R = 10^9$ independent configurations/second (already absurdly generous).
+
+- **$n=10$**:
+
+  $$
+  p_{\text{sorted}}=\frac{\binom{256+10-1}{10}}{256^{10}}
+  =\frac{\binom{265}{10}}{256^{10}}
+  \approx 3.28\times 10^{-7}.
+  $$
+
+  So $\mathbb{E}[T] \approx \frac{1}{10^9\cdot 3.28\times 10^{-7}} \approx 3\times 10^{-3}$ s (milliseconds).
+
+- **$n=20$**:
+
+  $$
+  p_{\text{sorted}}=\frac{\binom{275}{20}}{256^{20}}
+  \approx 8.48\times 10^{-19},
+  $$
+
+  so $\mathbb{E}[T]\approx 1.2\times 10^9$ s (about **38 years**).
+
+- **$n=30$**:
+  $$
+  p_{\text{sorted}}=\frac{\binom{285}{30}}{256^{30}}
+  \approx 1.94\times 10^{-32},
+  $$
+  so $\mathbb{E}[T]\approx 1.6\times 10^{15}$ years (far longer than the age of the universe).
+
+### Why the Real Runtime Is Worse
+
+The i.i.d. resampling model is not how bit flips work: real dynamics change _local bits_ and produce highly correlated states. The time to “mix” across the full $2^{nw}$ state space can dominate the hitting time, making the practical waiting time far larger than $\frac{1}{p_{\text{sorted}}}$ suggests. In other words, even when $p_{\text{sorted}}$ is not astronomically tiny, _actually reaching_ something close to the uniform distribution can be the bottleneck.
 
 Checking too frequently yields highly correlated observations; checking too infrequently risks missing short-lived sorted states. Neither choice improves the fundamental scaling.
-
-### Back-of-the-Envelope Timescale
-
-To illustrate the absurdity of the expected runtime, consider a toy example:
-
-- $n = 10$ elements
-- $w = 8$ bits per element (so $m = 256$)
-
-The fraction of sorted arrays is:
-
-$$
-p_{\text{sorted}} = \frac{\binom{256 + 10 - 1}{10}}{256^{10}} \approx \frac{\binom{265}{10}}{256^{10}}.
-$$
-
-This is on the order of:
-
-$$
-p_{\text{sorted}} \sim 10^{-14}.
-$$
-
-Even if the memory were to decorrelate completely and effectively resample its entire state at a rate of $10^9$ independent configurations per second, the expected waiting time would be on the order of:
-
-$$
-\mathbb{E}[T] \sim 10^5 \text{ seconds} \approx \text{days}.
-$$
-
-For $n = 20$, the expected waiting time already exceeds geological timescales. For realistic array sizes, the expected time to observe a sorted configuration vastly exceeds cosmological timescales, proton decay bounds, and any meaningful notion of “runtime” in physics.
-
-In other words, Cosmic Ray Sort is not merely impractical—it is _physically satirical_.
 
 ## Thermodynamic Interpretation
 
@@ -111,19 +120,9 @@ Whereas conventional algorithms actively reduce entropy, Cosmic Ray Sort passive
 
 Cosmic Ray Sort is computationally analogous to the Boltzmann brain paradox: both rely on rare thermal or stochastic fluctuations to produce highly structured, low-entropy states from equilibrium noise. In both cases, the event is possible in principle, but dominated in practice by timescales so large that their physical relevance is questionable.
 
-Cosmic Ray Sort can therefore be interpreted as a sorting algorithm that is correct in the same sense that Boltzmann brains are observers.
-
 ## Simulation Model
 
 This repository provides a simulation that injects random bit flips at a configurable rate.
-
-**Default model:**
-
-- Each flip selects a uniformly random bit among all \( B = n \cdot w \) bits and flips it (in real-time mode, flips arrive as a Poisson process).
-- Every \( T \) flips, the array is checked for nondecreasing order.
-- Parameters control array length, bit width, flip rate (flips per second in simulated time), check interval, and random seed.
-
-The simulation is intended to illustrate qualitative behavior and does not claim physical realism.
 
 ## Quickstart
 
@@ -132,43 +131,6 @@ git clone https://github.com/archudzik/CosmicRaySort.git
 cd CosmicRaySort
 python cosmic_ray_sort.py --n 5 --w 8 --flip-rate 1000 --check-every 100
 ```
-
-Example output:
-
-```text
-Initial array: [172, 233, 119, 173, 187]
-Params: n=5, w=8, flip_rate=1000.0/s, check_every=100, max_seconds=3.0, seed=None, mode=fast-sim
-Sorted detected: [32, 65, 91, 151, 158]
-Flips: 8400, Checks: 85, Wall: 0.002987s (2812375 flips/s), Simulated: 8.400000s
-```
-
-## Limitations
-
-- The expected runtime is prohibitive for nontrivial input sizes.
-- The sorted configuration is unstable under continued noise.
-- Real hardware employs error correction and shielding that suppress the very effects this algorithm relies on.
-- The checker and control logic must themselves be protected from noise for correctness to be meaningful.
-- Local bit flips mix the global state space extremely slowly for large \( B \).
-
-These limitations are intrinsic to the approach.
-
-## Related Work
-
-- Bogosort
-- Miracle Sort
-- Infinite monkey theorems
-- Randomized and Monte Carlo algorithms
-- Physical models of computation and thermodynamic limits
-
-## Comparison to Bogosort
-
-| Property          | Bogosort                     | Cosmic Ray Sort               |
-| ----------------- | ---------------------------- | ----------------------------- |
-| Writes to memory  | Yes (active shuffling)       | No (passive observation only) |
-| Source of entropy | Algorithmic randomness       | Physical noise                |
-| Correctness       | Eventual hit of sorted state | Eventual hit of sorted state  |
-| Expected runtime  | Catastrophic                 | Cosmological                  |
-| Practical use     | None                         | Even less                     |
 
 ## Conclusion
 
