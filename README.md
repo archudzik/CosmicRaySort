@@ -78,31 +78,33 @@ $$
 
 Take $w=8$ ($m=256$) and $R = 10^9$ independent configurations/second (already absurdly generous).
 
-- **$n=10$**:
+**$n=10$**:
 
-  $$
-  p_{\text{sorted}}=\frac{\binom{256+10-1}{10}}{256^{10}}
-  =\frac{\binom{265}{10}}{256^{10}}
-  \approx 3.28\times 10^{-7}.
-  $$
+$$
+p_{\text{sorted}}=\frac{\binom{256+10-1}{10}}{256^{10}}
+=\frac{\binom{265}{10}}{256^{10}}
+\approx 3.28\times 10^{-7}.
+$$
 
-  So $\mathbb{E}[T] \approx \frac{1}{10^9\cdot 3.28\times 10^{-7}} \approx 3\times 10^{-3}$ s (milliseconds).
+So $\mathbb{E}[T] \approx \frac{1}{10^9\cdot 3.28\times 10^{-7}} \approx 3\times 10^{-3}$ s (milliseconds).
 
-- **$n=20$**:
+**$n=20$**:
 
-  $$
-  p_{\text{sorted}}=\frac{\binom{275}{20}}{256^{20}}
-  \approx 8.48\times 10^{-19},
-  $$
+$$
+p_{\text{sorted}}=\frac{\binom{275}{20}}{256^{20}}
+\approx 8.48\times 10^{-19},
+$$
 
-  so $\mathbb{E}[T]\approx 1.2\times 10^9$ s (about **38 years**).
+so $\mathbb{E}[T]\approx 1.2\times 10^9$ s (about **38 years**).
 
-- **$n=30$**:
-  $$
-  p_{\text{sorted}}=\frac{\binom{285}{30}}{256^{30}}
-  \approx 1.94\times 10^{-32},
-  $$
-  so $\mathbb{E}[T]\approx 1.6\times 10^{15}$ years (far longer than the age of the universe).
+**$n=30$**:
+
+$$
+p_{\text{sorted}}=\frac{\binom{285}{30}}{256^{30}}
+\approx 1.94\times 10^{-32},
+$$
+
+so $\mathbb{E}[T]\approx 1.6\times 10^{15}$ years (far longer than the age of the universe).
 
 ### Why the Real Runtime Is Worse
 
