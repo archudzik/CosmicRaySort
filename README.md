@@ -6,8 +6,7 @@ _This repository is a joke / thought experiment made executable via simulation._
 ![correctness](https://img.shields.io/badge/correctness-almost%20sure-blue)
 ![runtime](https://img.shields.io/badge/expected%20runtime-cosmological-red)
 
-> The worst sorting algorithm ever: do nothing and wait until random bit flips in memory  
-> (e.g. from cosmic rays) accidentally transform your array into sorted order.
+> The worst sorting algorithm ever: do nothing and wait until random bit flips in memory (e.g. from cosmic rays) accidentally transform your array into sorted order.
 
 ## Abstract
 
@@ -23,18 +22,18 @@ This repository treats physical noise not as a failure mode to be mitigated, but
 
 ## Algorithm
 
-Given an array \( A = (a_1, \ldots, a_n) \):
+Given an array $A = (a_1, \ldots, a_n)$:
 
-1. Store \( A \) in memory.
+1. Store $A$ in memory.
 2. Allow the memory to evolve under environmental perturbations that induce random bit flips.
-3. Periodically check whether \( A \) is sorted (nondecreasing).
+3. Periodically check whether $A$ is sorted (nondecreasing).
 4. Halt when a sorted configuration is observed.
 
 The algorithm performs no write operations on the array; all state changes are delegated to physical noise.
 
 ## Physical Model
 
-Each bit is modeled as a bistable physical system with two metastable states separated by an energy barrier \( \Delta E \). Environmental coupling induces rare stochastic transitions between states. Under weak coupling to a thermal bath, the global memory configuration evolves as a continuous-time Markov process over a finite state space of size \( 2^{B} \), where \( B = n \cdot w \) is the total number of bits.
+Each bit is modeled as a bistable physical system with two metastable states separated by an energy barrier $\Delta E$. Environmental coupling induces rare stochastic transitions between states. Under weak coupling to a thermal bath, the global memory configuration evolves as a continuous-time Markov process over a finite state space of size $2^B$, where $B = n \cdot w$ is the total number of bits.
 
 At a fundamental level, physical dynamics may be unitary and deterministic. However, for any realistic subsystem the effective dynamics are stochastic due to chaotic many-body interactions, entanglement with unobserved degrees of freedom, decoherence, and coarse-graining. For computational purposes, bit flips are therefore modeled as random events.
 
@@ -57,19 +56,19 @@ When the algorithm halts, the observed array is guaranteed to be sorted.
 
 ## Expected Runtime
 
-Let each array element be represented by \( w \) bits, so that values lie in \( \{0, \ldots, m-1\} \) with \( m = 2^w \). The number of nondecreasing (“sorted”) arrays of length \( n \) is:
+Let each array element be represented by $w$ bits, so that values lie in $\{0, \ldots, m-1\}$ with $m = 2^w$. The number of nondecreasing (“sorted”) arrays of length $n$ is:
 
-\[
+$$
 \binom{m + n - 1}{n}.
-\]
+$$
 
-In the symmetric independent bit-flip model, the stationary distribution over all \( m^n \) arrays is uniform. The stationary probability that the array is sorted is therefore:
+In the symmetric independent bit-flip model, the stationary distribution over all $m^n$ arrays is uniform. The stationary probability that the array is sorted is therefore:
 
-\[
-p\_{\text{sorted}} = \frac{\binom{m + n - 1}{n}}{m^n}.
-\]
+$$
+p_{\text{sorted}} = \frac{\binom{m + n - 1}{n}}{m^n}.
+$$
 
-The expected waiting time scales like \( 1 / p\_{\text{sorted}} \), up to factors determined by temporal correlations and the mixing time of the underlying Markov process. This quantity grows rapidly with \( n \), rendering the expected runtime astronomically large for all but trivial input sizes.
+The expected waiting time scales like $1 / p_{\text{sorted}}$, up to factors determined by temporal correlations and the mixing time of the underlying Markov process. This quantity grows rapidly with $n$, rendering the expected runtime astronomically large for all but trivial input sizes.
 
 Checking too frequently yields highly correlated observations; checking too infrequently risks missing short-lived sorted states. Neither choice improves the fundamental scaling.
 
@@ -77,28 +76,28 @@ Checking too frequently yields highly correlated observations; checking too infr
 
 To illustrate the absurdity of the expected runtime, consider a toy example:
 
-- \( n = 10 \) elements
-- \( w = 8 \) bits per element (so \( m = 256 \))
+- $n = 10$ elements
+- $w = 8$ bits per element (so $m = 256$)
 
 The fraction of sorted arrays is:
 
-\[
-p\_{\text{sorted}} = \frac{\binom{256 + 10 - 1}{10}}{256^{10}} \approx \frac{\binom{265}{10}}{256^{10}}.
-\]
+$$
+p_{\text{sorted}} = \frac{\binom{256 + 10 - 1}{10}}{256^{10}} \approx \frac{\binom{265}{10}}{256^{10}}.
+$$
 
 This is on the order of:
 
-\[
-p\_{\text{sorted}} \sim 10^{-14}.
-\]
+$$
+p_{\text{sorted}} \sim 10^{-14}.
+$$
 
-Even if the memory were to decorrelate completely and effectively resample its entire state at a rate of \( 10^9 \) independent configurations per second (already wildly optimistic for any physical system), the expected waiting time would be on the order of:
+Even if the memory were to decorrelate completely and effectively resample its entire state at a rate of $10^9$ independent configurations per second, the expected waiting time would be on the order of:
 
-\[
-\mathbb{E}[T] \sim 10^{5} \text{ seconds} \approx \text{days}.
-\]
+$$
+\mathbb{E}[T] \sim 10^5 \text{ seconds} \approx \text{days}.
+$$
 
-For \( n = 20 \), the expected waiting time already exceeds geological timescales. For realistic array sizes, the expected time to observe a sorted configuration vastly exceeds cosmological timescales, proton decay bounds, and any meaningful notion of “runtime” in physics.
+For $n = 20$, the expected waiting time already exceeds geological timescales. For realistic array sizes, the expected time to observe a sorted configuration vastly exceeds cosmological timescales, proton decay bounds, and any meaningful notion of “runtime” in physics.
 
 In other words, Cosmic Ray Sort is not merely impractical—it is _physically satirical_.
 
