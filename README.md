@@ -1,6 +1,6 @@
 # Cosmic Ray Sort ☢️
 
-_This repository is a joke / thought experiment made executable via simulation._
+_This repository is a thought experiment made executable via simulation._
 
 ![status](https://img.shields.io/badge/status-experimentally%20useless-brightgreen)
 ![correctness](https://img.shields.io/badge/correctness-almost%20sure-blue)
